@@ -1,5 +1,7 @@
 import json
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 async def links(bot, message):
     with open('links.json', 'r') as file:

@@ -1,11 +1,14 @@
 
 # commands
-from cogs.commands.help import help
-from cogs.commands.timetable import timetable, timetable_callback, process_timetable_message
 from cogs.commands.deadlines import deadlines
 from cogs.commands.exam.exam import exam
+from cogs.commands.help import help
 from cogs.commands.links import links
-
+from cogs.commands.timetable import (
+    process_timetable_message,
+    timetable,
+    timetable_callback,
+)
 
 
 class Commands:
@@ -15,7 +18,7 @@ class Commands:
     async def start_text(self, message):  # ✅
         await self.bot.send_message(
             message.chat.id,
-            f"""Hello 👋\nUse /help for every command details\n\nJoin https://t.me/MNUelf for updates""",
+            """Hello 👋\nUse /help for every command details\n\nJoin https://t.me/MNUelf for updates""",
         )
 
     # -----------------------------------------------------------------------------------------------

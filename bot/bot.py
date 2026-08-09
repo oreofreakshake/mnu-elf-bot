@@ -1,8 +1,9 @@
-import os
 import asyncio
+import os
+
+from dotenv import load_dotenv
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import BotCommand
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -11,6 +12,9 @@ from cogs import cog__init__, commandnames
 from cogs.commands.timetable import check_and_send_notifications
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+
+if BOT_TOKEN is None:
+    raise ValueError("TOKEN is missing")
 
 bot = AsyncTeleBot(BOT_TOKEN)
 
@@ -25,7 +29,7 @@ async def set_commands():
         for name, description in zip(name.commandsname, name.commanddescript)
     ]
 
-    await bot.set_my_commands(commands[:len(commandnames.commandsname)]) 
+    await bot.set_my_commands(commands[:len(commandnames.commandsname)])
 
     cmd = await bot.get_my_commands(scope=None, language_code=None)
     print([c.to_json() for c in cmd])

@@ -1,4 +1,3 @@
-from cogs import commandnames
 
 async def help(bot, message):
     message_text = "Here are the commands you can use!\nYou can also use the menu button to navigate through the bot!\n\n"

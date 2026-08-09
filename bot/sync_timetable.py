@@ -1,5 +1,6 @@
 import json
 
+
 def sync_timetable():
     with open('timetable.json', 'r') as timetable_file:
         timetable_data = json.load(timetable_file)

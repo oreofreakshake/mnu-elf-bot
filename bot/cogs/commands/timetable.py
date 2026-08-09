@@ -1,9 +1,10 @@
+import asyncio
 import json
 import os
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from prettytable import PrettyTable
-import asyncio
 from datetime import datetime, timedelta
+
+from prettytable import PrettyTable
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -189,7 +190,7 @@ async def handle_message(bot, message):
             else:
                 await bot.send_message(chat_id, f"{subject_code} is already in your timetable")
         else:
-            await bot.send_message(chat_id, f"Subject code not found")
+            await bot.send_message(chat_id, "Subject code not found")
         
         user_states[chat_id] = 'MAIN_MENU'
         await bot.send_message(chat_id, "What would you like to do next?", reply_markup=create_timetable_markup())
