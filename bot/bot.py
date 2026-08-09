@@ -1,15 +1,21 @@
 import asyncio
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import BotCommand
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 # my lib
 from cogs import cog__init__, commandnames
-from cogs.commands.timetable import check_and_send_notifications
+from cogs.commands.timetable import (
+    TimetableUnavailable,
+    check_and_send_notifications,
+    migrate_legacy_user_data,
+    track_telegram_user,
+)
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
@@ -36,27 +42,22 @@ async def set_commands():
 
 @bot.message_handler(commands=["hello", "start"])
 async def start_command(message):
+    await track_telegram_user(message)
     await command.start_text(message)
 
 @bot.message_handler(commands=["help"])
 async def help_command(message):
+    await track_telegram_user(message)
     await command.help(message)
 
 @bot.message_handler(commands=["links"])
 async def links_command(message):
+    await track_telegram_user(message)
     await command.links(message)
 
 @bot.message_handler(commands=["table"])
 async def timetable_command(message):
     await command.timetable(message)
-
-@bot.message_handler(commands=["dues"])
-async def deadline_command(message):
-    await command.deadlines(message)
-
-@bot.message_handler(commands=["exam"])
-async def exam_command(message):
-    await command.exam(message)
 
 # -----------------------------------------------------------------------------------------------
 
@@ -70,6 +71,10 @@ async def message_handler(message):
 
 async def main():
     print("Bot is starting...")
+    try:
+        await migrate_legacy_user_data()
+    except (TimetableUnavailable, OSError, ValueError) as exc:
+        print(f"Legacy user migration will be retried on the next restart: {exc}")
     await set_commands()
     print("Commands set. Bot is now polling...")
 

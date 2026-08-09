@@ -1,0 +1,9 @@
+data/
+tmp/
+.venv/
+frontend/node_modules/
+frontend/dist/
+**/__pycache__/
+**/.ruff_cache/
+*.pyc
+.env

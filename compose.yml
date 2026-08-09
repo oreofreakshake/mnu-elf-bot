@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-timetable}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-timetable}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-timetable}
+      STORAGE_DIR: /data/uploads
+      CORS_ORIGINS: http://localhost:5173,http://localhost:8080
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-500}
+      BOT_SERVICE_TOKEN: ${BOT_SERVICE_TOKEN:-local-development-token}
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
+      ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS:-}
+      SESSION_DAYS: ${SESSION_DAYS:-7}
+      SECURE_COOKIES: ${SECURE_COOKIES:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploaded-pdfs:/data/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  worker:
+    build: ./backend
+    command: ["python", "-m", "app.worker"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-timetable}
+      STORAGE_DIR: /data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploaded-pdfs:/data/uploads
+    restart: unless-stopped
+
+  bot:
+    build: ./bot
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      TIMETABLE_API_URL: http://api:8000/api
+      BOT_DATA_DIR: /data
+      BOT_TIMEZONE: Indian/Maldives
+      TIMETABLE_CACHE_SECONDS: 60
+      BOT_SERVICE_TOKEN: ${BOT_SERVICE_TOKEN:-local-development-token}
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - bot-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  uploaded-pdfs:
+  bot-data:
