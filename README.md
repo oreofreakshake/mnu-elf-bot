@@ -80,25 +80,22 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:8080
 ```
 `BOT_SERVICE_TOKEN` is the token you enter on the local sign-in screen.
 
-2. Start development mode
-``` docker compose -f compose.yml -f compose.dev.yml --profile dev up -d --build postgres api worker bot frontend-dev ```
-Open: 
-``` http://localhost:5173 ```
-
-3. View logs
-``` docker compose -f compose.yml -f compose.dev.yml --profile dev logs -f ```
-Individual services:
+2. Start development mode `localhost:5173` 
 ```
-docker compose -f compose.yml -f compose.dev.yml logs -f api
-docker compose -f compose.yml -f compose.dev.yml logs -f worker
-docker compose -f compose.yml -f compose.dev.yml logs -f bot
-docker compose -f compose.yml -f compose.dev.yml logs -f frontend-dev
+docker compose -f compose.yml -f compose.dev.yml --profile dev up -d --build postgres api worker bot frontend-dev
 ```
 
-4. Test the production-style frontend locally
-``` docker compose -f compose.yml -f compose.dev.yml up -d --build frontend ```
-Open:
-``` http://localhost:8080 ```
+4. View logs
+```
+docker compose -f compose.yml -f compose.dev.yml --profile dev logs -f
+```
 
-5. Stop Locally
-``` docker compose -f compose.yml -f compose.dev.yml --profile dev down ```
+6. Test the production-style frontend locally `localhost:8080` 
+```
+docker compose -f compose.yml -f compose.dev.yml up -d --build frontend
+```
+
+8. Stop Locally
+```
+docker compose -f compose.yml -f compose.dev.yml --profile dev down
+```
