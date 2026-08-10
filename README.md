@@ -57,4 +57,48 @@ _By using this bot, you acknowledge and agree to the following_
 - Support Group: https://t.me/MNUelf
 
 ## How to run locally
-- 
+1. Prepare .env
+```
+cp .env.example .env
+```
+
+configure at least
+
+```
+BOT_TOKEN=your_botfather_token
+TELEGRAM_BOT_USERNAME=your_bot_username
+ADMIN_TELEGRAM_IDS=your_numeric_telegram_id
+
+POSTGRES_DB=timetable
+POSTGRES_USER=mnuelf
+POSTGRES_PASSWORD=local-database-password
+
+BOT_SERVICE_TOKEN=local-development-token
+SESSION_DAYS=7
+SECURE_COOKIES=false
+CORS_ORIGINS=http://localhost:5173,http://localhost:8080
+```
+`BOT_SERVICE_TOKEN` is the token you enter on the local sign-in screen.
+
+2. Start development mode
+``` docker compose -f compose.yml -f compose.dev.yml --profile dev up -d --build postgres api worker bot frontend-dev ```
+Open: 
+``` http://localhost:5173 ```
+
+3. View logs
+``` docker compose -f compose.yml -f compose.dev.yml --profile dev logs -f ```
+Individual services:
+```
+docker compose -f compose.yml -f compose.dev.yml logs -f api
+docker compose -f compose.yml -f compose.dev.yml logs -f worker
+docker compose -f compose.yml -f compose.dev.yml logs -f bot
+docker compose -f compose.yml -f compose.dev.yml logs -f frontend-dev
+```
+
+4. Test the production-style frontend locally
+``` docker compose -f compose.yml -f compose.dev.yml up -d --build frontend ```
+Open:
+``` http://localhost:8080 ```
+
+5. Stop Locally
+``` docker compose -f compose.yml -f compose.dev.yml --profile dev down ```

@@ -7,3 +7,4 @@ frontend/dist/
 **/.ruff_cache/
 *.pyc
 .env
+backups/

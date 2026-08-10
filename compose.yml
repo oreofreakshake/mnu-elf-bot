@@ -1,8 +1,6 @@
 services:
   postgres:
     image: postgres:17-alpine
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-timetable}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -14,6 +12,8 @@ services:
       retries: 10
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
     restart: unless-stopped
 
   api:
@@ -21,7 +21,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-timetable}
       STORAGE_DIR: /data/uploads
-      CORS_ORIGINS: http://localhost:5173,http://localhost:8080
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-500}
       BOT_SERVICE_TOKEN: ${BOT_SERVICE_TOKEN:-local-development-token}
       BOT_TOKEN: ${BOT_TOKEN:-}
@@ -34,6 +34,8 @@ services:
         condition: service_healthy
     volumes:
       - uploaded-pdfs:/data/uploads
+    networks:
+      - backend
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
       interval: 3s
@@ -52,6 +54,8 @@ services:
         condition: service_healthy
     volumes:
       - uploaded-pdfs:/data/uploads
+    networks:
+      - backend
     restart: unless-stopped
 
   bot:
@@ -68,6 +72,8 @@ services:
         condition: service_healthy
     volumes:
       - bot-data:/data
+    networks:
+      - backend
     restart: unless-stopped
 
   frontend:
@@ -77,9 +83,14 @@ services:
         VITE_API_URL: ""
     depends_on:
       - api
-    ports:
-      - "8080:80"
+    networks:
+      - proxy
+      - backend
     restart: unless-stopped
+
+networks:
+  proxy:
+  backend:
 
 volumes:
   postgres-data:
