@@ -255,12 +255,12 @@ def format_timetable(offerings: list[JsonDict]) -> list[str]:
         if not subjects:
             continue
         table = PrettyTable()
-        table.field_names = ["Code", "Time", "Room", "Type"]
+        table.field_names = ["Time", "Room", "Type"]
         for field in table.field_names:
             table.align[field] = "l"
         for subject in subjects:
             session_type = subject.get("sessionType") or ("L" if subject.get("L") else "T")
-            table.add_row([subject["subCode"], subject["time"], subject["room"], session_type])
+            table.add_row([subject["time"], subject["room"], session_type])
         heading = f"*{subjects[0]['subName']}* · {offering['course']}"
         tables.append(f"{heading}\n```\n{table}```\n")
     return tables or ["📅 Your timetable is empty"]
@@ -424,7 +424,9 @@ async def timetable_callback(bot, call) -> None:
     elif call.data == "view_timetable":
         await bot.answer_callback_query(call.id)
         try:
-            offerings = await resolved_user_offerings(telegram_user_id)
+            # User-requested views should always reflect the latest verified
+            # values from the currently published document.
+            offerings = await resolved_user_offerings(telegram_user_id, force=True)
             for table in format_timetable(offerings):
                 await bot.send_message(chat_id, table, parse_mode="Markdown")
         except TimetableUnavailable as exc:

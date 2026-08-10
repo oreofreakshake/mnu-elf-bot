@@ -11,4 +11,3 @@ export function Progress({ value = 0, className }: { value?: number; className?:
     </ProgressPrimitive.Root>
   )
 }
-

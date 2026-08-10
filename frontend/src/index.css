@@ -5,36 +5,37 @@
 
 @layer base {
   :root {
-    --background: 225 33% 97%;
-    --foreground: 224 32% 12%;
+    --background: 214 38% 97%;
+    --foreground: 218 38% 13%;
     --card: 0 0% 100%;
-    --card-foreground: 224 32% 12%;
-    --primary: 258 69% 55%;
+    --card-foreground: 218 38% 13%;
+    --primary: 216 89% 43%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 226 36% 94%;
-    --secondary-foreground: 224 30% 20%;
-    --muted: 225 25% 95%;
-    --muted-foreground: 220 12% 45%;
-    --accent: 258 70% 96%;
-    --accent-foreground: 258 69% 38%;
+    --secondary: 214 55% 94%;
+    --secondary-foreground: 218 48% 22%;
+    --muted: 214 30% 95%;
+    --muted-foreground: 215 15% 43%;
+    --accent: 213 80% 95%;
+    --accent-foreground: 216 89% 35%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 22% 88%;
-    --input: 225 22% 84%;
-    --ring: 258 69% 55%;
-    --radius: 0.85rem;
+    --border: 214 27% 87%;
+    --input: 214 27% 82%;
+    --ring: 216 89% 43%;
+    --radius: 0.65rem;
   }
 
-  * { @apply border-border; }
+  * {
+    @apply border-border;
+  }
   body {
     @apply min-h-screen bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at 10% -10%, rgba(124, 85, 219, .12), transparent 32rem),
-      radial-gradient(circle at 100% 10%, rgba(29, 78, 216, .07), transparent 28rem);
+    background-image: linear-gradient(180deg, rgba(219, 234, 254, 0.42), transparent 20rem);
   }
 }
 
 @layer utilities {
-  .text-balance { text-wrap: balance; }
+  .text-balance {
+    text-wrap: balance;
+  }
 }
-

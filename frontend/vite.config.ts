@@ -8,9 +8,15 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "./src") },
   },
   server: {
+    host: "0.0.0.0",
     port: 5173,
+    watch: { usePolling: process.env.CHOKIDAR_USEPOLLING === "true" },
     proxy: {
-      "/api": "http://localhost:8000",
+      "/api": {
+        target: process.env.VITE_PROXY_TARGET ?? "http://localhost:8000",
+        changeOrigin: false,
+        headers: { Host: "localhost" },
+      },
     },
   },
 })
