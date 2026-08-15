@@ -3,7 +3,7 @@ import { AlertCircle, LoaderCircle } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getAuthConfig, loginForDevelopment, loginWithTelegram } from "@/lib/api"
+import { apiErrorMessage, getAuthConfig, loginForDevelopment, loginWithTelegram } from "@/lib/api"
 import type { TelegramAuthData, TelegramUserRecord } from "@/types"
 
 declare global {
@@ -75,7 +75,8 @@ export function LoginPage({ onLogin }: { onLogin: (user: TelegramUserRecord) => 
         </div>
         {(mutation.isError || developmentMutation.isError) && (
           <p className="mt-3 flex items-center justify-center gap-2 text-sm text-red-600">
-            <AlertCircle className="h-4 w-4" /> Sign-in failed.
+            <AlertCircle className="h-4 w-4" />
+            {apiErrorMessage(developmentMutation.error ?? mutation.error, "Sign-in failed")}
           </p>
         )}
       </section>

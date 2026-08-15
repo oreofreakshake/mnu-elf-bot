@@ -4,6 +4,11 @@ import type { DocumentRecord, Entry, Issue, TelegramAuthData, TelegramUserRecord
 export const API_URL = import.meta.env.VITE_API_URL ?? ""
 const api = axios.create({ baseURL: `${API_URL}/api`, withCredentials: true })
 
+export function apiErrorMessage(error: unknown, fallback: string) {
+  if (axios.isAxiosError<{ detail?: string }>(error)) return error.response?.data?.detail ?? fallback
+  return error instanceof Error ? error.message : fallback
+}
+
 export const getAuthConfig = async () => (await api.get<{ telegramBotUsername: string }>("/auth/config")).data
 export const getCurrentUser = async () => (await api.get<TelegramUserRecord>("/auth/me")).data
 export const loginWithTelegram = async (payload: TelegramAuthData) =>

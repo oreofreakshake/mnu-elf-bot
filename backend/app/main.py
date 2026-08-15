@@ -252,6 +252,40 @@ def create_dashboard_session(user: TelegramUser, response: Response, session: Se
     )
 
 
+def get_or_create_development_admin(session: Session) -> TelegramUser:
+    user = session.scalar(
+        select(TelegramUser)
+        .where(TelegramUser.role == "admin", TelegramUser.is_active.is_(True))
+        .options(selectinload(TelegramUser.subjects))
+        .order_by(TelegramUser.created_at)
+    )
+    if user:
+        return user
+
+    administrator_ids = sorted(settings.administrator_ids)
+    if not administrator_ids:
+        raise HTTPException(
+            status_code=409,
+            detail="Set ADMIN_TELEGRAM_IDS to bootstrap local administrator access",
+        )
+
+    telegram_user_id = administrator_ids[0]
+    user = session.scalar(
+        select(TelegramUser).where(TelegramUser.telegram_user_id == telegram_user_id)
+    )
+    if user is None:
+        user = TelegramUser(
+            telegram_user_id=telegram_user_id,
+            notification_chat_id=telegram_user_id,
+        )
+        session.add(user)
+    user.role = "admin"
+    user.is_active = True
+    user.last_seen_at = utcnow()
+    session.commit()
+    return get_telegram_user_or_404(telegram_user_id, session)
+
+
 @app.post("/api/auth/development")
 def development_login(
     payload: DevelopmentLogin,
@@ -264,14 +298,7 @@ def development_login(
         raise HTTPException(status_code=404, detail="Not found")
     if not secrets.compare_digest(payload.token, settings.bot_service_token):
         raise HTTPException(status_code=401, detail="Invalid development access token")
-    user = session.scalar(
-        select(TelegramUser)
-        .where(TelegramUser.role == "admin", TelegramUser.is_active.is_(True))
-        .options(selectinload(TelegramUser.subjects))
-        .order_by(TelegramUser.created_at)
-    )
-    if not user:
-        raise HTTPException(status_code=409, detail="No administrator has been configured")
+    user = get_or_create_development_admin(session)
     create_dashboard_session(user, response, session)
     return user_payload(user, include_subjects=True)
 

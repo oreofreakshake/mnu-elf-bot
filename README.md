@@ -80,6 +80,8 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:8080
 ```
 `BOT_SERVICE_TOKEN` is the token you enter on the local sign-in screen.
 
+On a fresh database, a successful local sign-in creates an administrator for the first numeric ID in `ADMIN_TELEGRAM_IDS`. Sending `/start` to the bot afterward fills in that administrator's Telegram profile details.
+
 2. Start development mode `localhost:5173` 
 ```
 docker compose -f compose.yml -f compose.dev.yml --profile dev up -d --build postgres api worker bot frontend-dev
